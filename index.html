@@ -136,12 +136,12 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .rank-pos.bronze{color:#B87333}
 .rank-thumb{width:36px;height:46px;border-radius:6px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif JP',serif;font-size:14px;color:rgba(255,255,255,.3)}
 .rank-thumb img{width:100%;height:100%;object-fit:cover}
-.rank-body{flex:1;min-width:0}
+.rank-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:1px}
 .rank-title{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
 .rank-sub{font-size:12px;color:var(--ink2)}
-.rank-stars{display:flex;gap:2px;margin-top:4px}
-.rank-star{font-size:13px;color:#F59E0B}
-.rank-star.empty{color:var(--border2)}
+.rank-stars{margin-top:3px;line-height:1;font-size:13px;letter-spacing:0}
+.rank-star-filled{color:#F59E0B}
+.rank-star-empty{color:var(--border2)}
 .work-avg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:99px;background:#FEF3C7;color:#B45309;margin-left:4px}
 @media(prefers-color-scheme:dark){.work-avg{background:#451A03;color:#FCD34D}}
 
@@ -320,9 +320,12 @@ function workAvgRating(wid){
 
 function starsHtml(rating, size){
   const sz = size||13;
-  return [1,2,3,4,5].map(s =>
-    `<span class="rank-star${rating>=s?'':' empty'}" style="font-size:${sz}px">★</span>`
+  const filled = Math.round(rating);
+  // Build with no whitespace between spans to avoid gaps
+  const spans = [1,2,3,4,5].map(s =>
+    `<span class="${s<=filled?'rank-star-filled':'rank-star-empty'}" style="font-size:${sz}px;line-height:1">★</span>`
   ).join('');
+  return `<div class="rank-stars">${spans}</div>`;
 }
 
 // ── Obras view ───────────────────────────────────────────
@@ -468,7 +471,7 @@ function renderRanking(){
           <div class="rank-body">
             <div class="rank-title">${w?escHtml(w.name):'?'} — Vol. ${v.num}</div>
             <div class="rank-sub">${w?escHtml(w.author):''}</div>
-            <div class="rank-stars">${starsHtml(v.rating, 13)}</div>
+            ${starsHtml(v.rating, 13)}
           </div>
           <div style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--ink);flex-shrink:0">${v.rating}<span style="font-size:12px;color:var(--ink2)">/5</span></div>
         </div>`;
@@ -490,7 +493,7 @@ function renderRanking(){
           <div class="rank-body">
             <div class="rank-title">${escHtml(w.name)}</div>
             <div class="rank-sub">${escHtml(w.author)} · ${rated} vol${rated!==1?'s':''} avaliado${rated!==1?'s':''}</div>
-            <div class="rank-stars">${starsHtml(Math.round(avg), 13)}</div>
+            ${starsHtml(Math.round(avg), 13)}
           </div>
           <div style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--ink);flex-shrink:0">${avg.toFixed(1)}<span style="font-size:12px;color:var(--ink2)">/5</span></div>
         </div>`;
